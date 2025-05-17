@@ -29,7 +29,7 @@ public class Product {
     @JsonManagedReference
     private Inventory inventory;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<ProductBooking> productBookings;
 }

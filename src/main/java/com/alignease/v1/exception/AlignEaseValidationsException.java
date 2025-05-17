@@ -19,8 +19,8 @@ public class AlignEaseValidationsException extends RuntimeException{
     }
 
     public AlignEaseValidationsException(String statusCode, String message) {
-		super(message);
-        this.status = RequestStatus.FAILURE.getStatus();
+        super(message);
+        this.setStatus(RequestStatus.FAILURE.getStatus());
         this.code = statusCode;
 	}
 

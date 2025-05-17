@@ -25,4 +25,5 @@ public class ResponseCodes {
     public static final String INSUFFICIENT_INVENTORY = "910";
     public static final String PRODUCT_BOOKING_SUCCESS = "911";
     public static final String PRODUCT_BOOKING_FAILURE = "912";
+    public static final String PRODUCT_BOOKING_HISTORY_FETCH_SUCCESS = "913";
 }
