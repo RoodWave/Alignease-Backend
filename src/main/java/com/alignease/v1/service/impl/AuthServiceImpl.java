@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             Optional<User> activeUserByEmail = userRepository.findActiveUserByEmail(authRequest.getEmail());
             if (activeUserByEmail.isEmpty()) {
-                throw new AlignEaseValidationsException(messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
+                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
             }
 
             User user = activeUserByEmail.get();
@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
             authResponse.setResponseCode(ResponseCodes.SUCCESS);
             authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGN_IN_SUCCESS, null));
         } catch (Exception e) {
-            throw new AlignEaseValidationsException(messages.getMessageForResponseCode(ResponseCodes.USER_SIGN_IN_FAILURE, null));
+            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.USER_SIGN_IN_FAILURE, null));
         }
         logger.info("Log In Ends");
         return authResponse;
@@ -75,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             Optional<User> activeUserByEmail = userRepository.findActiveUserByEmail(authRequest.getEmail());
             if (activeUserByEmail.isPresent()) {
-                throw new AlignEaseValidationsException(messages.getMessageForResponseCode(ResponseCodes.EMAIL_ALREADY_TAKEN, null));
+                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.EMAIL_ALREADY_TAKEN, null));
             }
 
             User user = modelMapper.map(authRequest, User.class);
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
             authResponse.setResponseCode(ResponseCodes.SUCCESS);
             authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_SUCCESS, null));
         } catch (Exception e) {
-            throw new AlignEaseValidationsException(messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_FAILURE, null));
+            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_FAILURE, null));
         }
         logger.info("Sign Up Ends");
         return authResponse;

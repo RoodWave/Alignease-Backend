@@ -21,4 +21,8 @@ public class ResponseCodes {
     public static final String PRODUCT_FETCH_FAILURE = "906";
     public static final String PRODUCT_DELETE_SUCCESS = "907";
     public static final String PRODUCT_DELETE_FAILURE = "908";
+    public static final String INVENTORY_NOT_FOUND = "909";
+    public static final String INSUFFICIENT_INVENTORY = "910";
+    public static final String PRODUCT_BOOKING_SUCCESS = "911";
+    public static final String PRODUCT_BOOKING_FAILURE = "912";
 }

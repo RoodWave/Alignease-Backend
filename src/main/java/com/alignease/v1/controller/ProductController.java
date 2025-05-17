@@ -1,5 +1,6 @@
 package com.alignease.v1.controller;
 
+import com.alignease.v1.dto.request.ProductBookingRequest;
 import com.alignease.v1.dto.request.ProductRequest;
 import com.alignease.v1.dto.response.ProductResponse;
 import com.alignease.v1.service.ProductService;
@@ -35,7 +36,12 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{productId}")
-    public ProductResponse getAllProducts(@PathVariable("productId") Long productId) {
+    public ProductResponse deleteProduct(@PathVariable("productId") Long productId) {
         return productService.deleteProduct(productId);
+    }
+
+    @PostMapping("/book")
+    public ProductResponse bookProduct(@RequestBody ProductBookingRequest productBookingRequest) {
+        return productService.bookProduct(productBookingRequest);
     }
 }

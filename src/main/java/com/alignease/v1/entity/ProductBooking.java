@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +28,9 @@ public class ProductBooking {
     @JoinColumn(name = "product_id")
     @JsonBackReference
     private Product product;
+
+    private Integer quantity;
+    private LocalDateTime bookingDate;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;

@@ -1,5 +1,6 @@
 package com.alignease.v1.service;
 
+import com.alignease.v1.dto.request.ProductBookingRequest;
 import com.alignease.v1.dto.request.ProductRequest;
 import com.alignease.v1.dto.response.ProductResponse;
 
@@ -9,4 +10,5 @@ public interface ProductService {
     ProductResponse getProductById(Long productId);
     ProductResponse getAllProducts();
     ProductResponse deleteProduct(Long productId);
+    ProductResponse bookProduct(ProductBookingRequest productBookingRequest);
 }
