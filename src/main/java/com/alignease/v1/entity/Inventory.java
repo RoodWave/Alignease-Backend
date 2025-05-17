@@ -1,5 +1,6 @@
 package com.alignease.v1.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,5 +25,6 @@ public class Inventory {
 
     @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "productId")
+    @JsonBackReference
     private Product product;
 }

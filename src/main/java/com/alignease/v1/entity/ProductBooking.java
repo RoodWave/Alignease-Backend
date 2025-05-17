@@ -24,6 +24,7 @@ public class ProductBooking {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonBackReference
     private Product product;
 
     @Enumerated(EnumType.STRING)

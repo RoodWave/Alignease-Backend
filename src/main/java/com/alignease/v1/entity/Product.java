@@ -1,5 +1,6 @@
 package com.alignease.v1.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,10 +23,13 @@ public class Product {
     private String model;
     private String size;
     private String price;
+    private String isDeleted;
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Inventory inventory;
 
     @OneToMany(mappedBy = "product")
+    @JsonManagedReference
     private List<ProductBooking> productBookings;
 }

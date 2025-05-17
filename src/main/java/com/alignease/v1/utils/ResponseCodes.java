@@ -12,4 +12,13 @@ public class ResponseCodes {
     public static final String USER_NOT_FOUND = "805";
     public static final String USER_SIGN_IN_SUCCESS = "806";
     public static final String USER_SIGN_IN_FAILURE = "807";
+    public static final String PRODUCT_ADD_SUCCESS = "900";
+    public static final String PRODUCT_ADD_FAILURE = "901";
+    public static final String PRODUCT_NOT_FOUND = "902";
+    public static final String PRODUCT_UPDATE_SUCCESS = "903";
+    public static final String PRODUCT_UPDATE_FAILURE = "904";
+    public static final String PRODUCT_FETCH_SUCCESS = "905";
+    public static final String PRODUCT_FETCH_FAILURE = "906";
+    public static final String PRODUCT_DELETE_SUCCESS = "907";
+    public static final String PRODUCT_DELETE_FAILURE = "908";
 }

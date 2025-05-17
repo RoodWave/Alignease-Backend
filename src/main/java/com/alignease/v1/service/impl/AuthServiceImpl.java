@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     ModelMapper modelMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
@@ -82,8 +82,9 @@ public class AuthServiceImpl implements AuthService {
             user.setIsDeleted(Constant.DB_FALSE);
             user.setPassword(bCryptPasswordEncoder.encode(authRequest.getPassword()));
 
+            User save = userRepository.save(user);
             logger.info("Sign Up Success");
-            authResponse.setUser(user);
+            authResponse.setUser(save);
             authResponse.setStatus(RequestStatus.SUCCESS.getStatus());
             authResponse.setResponseCode(ResponseCodes.SUCCESS);
             authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_SUCCESS, null));

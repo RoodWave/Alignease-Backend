@@ -24,6 +24,7 @@ public class ServiceBooking {
 
     @ManyToOne
     @JoinColumn(name = "service_id")
+    @JsonBackReference
     private Service service;
 
     @Enumerated(EnumType.STRING)
