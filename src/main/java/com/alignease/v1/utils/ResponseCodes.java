@@ -26,6 +26,13 @@ public class ResponseCodes {
     public static final String PRODUCT_BOOKING_SUCCESS = "911";
     public static final String PRODUCT_BOOKING_FAILURE = "912";
     public static final String PRODUCT_BOOKING_HISTORY_FETCH_SUCCESS = "913";
+    public static final String PRODUCT_BOOKING_NOT_FOUND = "914";
+    public static final String INVALID_BOOKING_STATE = "915";
+    public static final String PRODUCT_BOOKING_APPROVED = "916";
+    public static final String PRODUCT_BOOKING_REJECTED = "917";
+    public static final String SERVICE_BOOKING_NOT_FOUND = "918";
+    public static final String SERVICE_BOOKING_APPROVED = "919";
+    public static final String SERVICE_BOOKING_REJECTED = "920";
 
     public static final String SERVICE_ADD_SUCCESS = "1000";
     public static final String SERVICE_ADD_FAILURE = "1001";
