@@ -14,4 +14,18 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
+
+    private String title;
+    private String content;
+
+    @OneToOne
+    @JoinColumn(name = "service_booking_id")
+    private ServiceBooking serviceBooking;
+
+    @OneToOne
+    @JoinColumn(name = "product_booking_id")
+    private ProductBooking productBooking;
+
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
 }

@@ -5,23 +5,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "inventory")
+public class Inventory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long inventoryId;
 
-    @OneToMany(mappedBy = "user")
-    private List<ServiceBooking> serviceBookings;
+    private Integer quantity;
+    private String location;
 
-    @OneToMany(mappedBy = "user")
-    private List<ProductBooking> productBookings;
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private StockStatus stockStatus;
+
+    @OneToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "productId")
+    private Product product;
 }
