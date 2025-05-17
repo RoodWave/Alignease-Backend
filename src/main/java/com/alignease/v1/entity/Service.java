@@ -21,7 +21,11 @@ public class Service {
     private String description;
     private String cost;
     private String estimatedTime;
+    @Column(name = "image_path")
+    private String imagePath;
 
+    @Column(name = "image_name")
+    private String imageName;
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<ServiceBooking> serviceBookings;

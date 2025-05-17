@@ -7,6 +7,7 @@ import com.alignease.v1.entity.*;
 import com.alignease.v1.exception.AlignEaseValidationsException;
 import com.alignease.v1.repository.ServiceRepository;
 import com.alignease.v1.repository.UserRepository;
+import com.alignease.v1.service.FileStorageService;
 import com.alignease.v1.service.ServiceService;
 import com.alignease.v1.utils.Messages;
 import com.alignease.v1.utils.RequestStatus;
@@ -16,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +41,9 @@ public class ServiceServiceImpl implements ServiceService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     @Override
     @Transactional
     public ServiceResponse addService(ServiceRequest serviceRequest) {
@@ -46,7 +52,18 @@ public class ServiceServiceImpl implements ServiceService {
         ServiceResponse response = new ServiceResponse();
 
         try {
+            if (serviceRequest.getImageFile() != null) {
+                validateImage(serviceRequest.getImageFile());
+            }
+
             Service service = modelMapper.map(serviceRequest, Service.class);
+
+            if (serviceRequest.getImageFile() != null && !serviceRequest.getImageFile().isEmpty()) {
+                String fileName = fileStorageService.storeFile(serviceRequest.getImageFile());
+                service.setImageName(fileName);
+                service.setImagePath("/service-images/" + fileName);
+            }
+
             Service savedService = serviceRepository.save(service);
 
             response.setService(savedService);
@@ -56,11 +73,27 @@ public class ServiceServiceImpl implements ServiceService {
 
             logger.info("Add Service Success");
         } catch (Exception e) {
+            logger.error("Error adding service: {}", e.getMessage(), e);
             throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
                     messages.getMessageForResponseCode(ResponseCodes.SERVICE_ADD_FAILURE, null));
         }
 
         return response;
+    }
+
+    private void validateImage(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new AlignEaseValidationsException("Image file is empty");
+        }
+
+        String contentType = file.getContentType();
+        if (!Arrays.asList("image/jpeg", "image/png", "image/gif").contains(contentType)) {
+            throw new AlignEaseValidationsException("Only JPG, PNG or GIF images are allowed");
+        }
+
+        if (file.getSize() > 10_000_000) {
+            throw new AlignEaseValidationsException("File size exceeds 10MB limit");
+        }
     }
 
     @Override
