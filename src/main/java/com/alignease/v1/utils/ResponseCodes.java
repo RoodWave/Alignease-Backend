@@ -26,4 +26,16 @@ public class ResponseCodes {
     public static final String PRODUCT_BOOKING_SUCCESS = "911";
     public static final String PRODUCT_BOOKING_FAILURE = "912";
     public static final String PRODUCT_BOOKING_HISTORY_FETCH_SUCCESS = "913";
+
+    public static final String SERVICE_ADD_SUCCESS = "1000";
+    public static final String SERVICE_ADD_FAILURE = "1001";
+    public static final String SERVICE_NOT_FOUND = "1002";
+    public static final String SERVICE_UPDATE_SUCCESS = "1003";
+    public static final String SERVICE_UPDATE_FAILURE = "1004";
+    public static final String SERVICE_FETCH_SUCCESS = "1005";
+    public static final String SERVICE_FETCH_FAILURE = "1006";
+    public static final String SERVICE_DELETE_SUCCESS = "1007";
+    public static final String SERVICE_DELETE_FAILURE = "1008";
+    public static final String SERVICE_BOOKING_SUCCESS = "1011";
+    public static final String SERVICE_BOOKING_FAILURE = "1012";
 }

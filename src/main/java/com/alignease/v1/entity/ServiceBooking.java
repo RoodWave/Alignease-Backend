@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +18,8 @@ public class ServiceBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long serviceBookingId;
+
+    private LocalDateTime bookingDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

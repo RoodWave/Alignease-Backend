@@ -22,7 +22,7 @@ public class Service {
     private String cost;
     private String estimatedTime;
 
-    @OneToMany(mappedBy = "service")
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<ServiceBooking> serviceBookings;
 }
