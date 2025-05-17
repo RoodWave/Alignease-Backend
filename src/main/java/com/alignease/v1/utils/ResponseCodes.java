@@ -38,4 +38,5 @@ public class ResponseCodes {
     public static final String SERVICE_DELETE_FAILURE = "1008";
     public static final String SERVICE_BOOKING_SUCCESS = "1011";
     public static final String SERVICE_BOOKING_FAILURE = "1012";
+    public static final String SERVICE_BOOKING_HISTORY_FETCH_SUCCESS = "1013";
 }
