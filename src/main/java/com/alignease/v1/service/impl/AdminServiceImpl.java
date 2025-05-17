@@ -77,6 +77,24 @@ public class AdminServiceImpl implements AdminService {
         booking.setBookingStatus(status);
         productBookingRepository.save(booking);
 
+        if (status == BookingStatus.REJECTED) {
+            Product product = booking.getProduct();
+            if (product != null && product.getInventory() != null) {
+                Inventory inventory = product.getInventory();
+                int bookedQuantity = booking.getQuantity() != null ? booking.getQuantity() : 0;
+                inventory.setQuantity(inventory.getQuantity() + bookedQuantity);
+
+                if (inventory.getQuantity() > 0) {
+                    inventory.setStockStatus(StockStatus.IN_STOCK);
+                }
+
+                product.setInventory(inventory);
+                productBookingRepository.save(booking);
+            } else {
+                logger.warn("No inventory found for product booking ID: {}", bookingId);
+            }
+        }
+
         response.setStatus(RequestStatus.SUCCESS.getStatus());
         response.setResponseCode(ResponseCodes.SUCCESS);
         response.setMessage(messages.getMessageForResponseCode(

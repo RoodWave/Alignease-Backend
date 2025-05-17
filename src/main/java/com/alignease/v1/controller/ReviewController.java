@@ -1,10 +1,12 @@
 package com.alignease.v1.controller;
 
+import com.alignease.v1.dto.request.ProductReviewRequest;
+import com.alignease.v1.dto.request.ReviewStatusRequest;
+import com.alignease.v1.dto.request.ServiceReviewRequest;
+import com.alignease.v1.dto.response.ReviewResponse;
 import com.alignease.v1.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
@@ -12,5 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 
     @Autowired
-    ReviewService reviewService;
+    private ReviewService reviewService;
+
+    @PostMapping("/product")
+    public ReviewResponse createProductReview(@RequestBody ProductReviewRequest request) {
+        return reviewService.createProductReview(request);
+    }
+
+    @PostMapping("/service")
+    public ReviewResponse createServiceReview(@RequestBody ServiceReviewRequest request) {
+        return reviewService.createServiceReview(request);
+    }
+
+    @PutMapping("/status")
+    public ReviewResponse updateReviewStatus(@RequestBody ReviewStatusRequest request) {
+        return reviewService.updateReviewStatus(request);
+    }
 }

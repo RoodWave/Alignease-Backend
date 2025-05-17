@@ -7,6 +7,7 @@ import com.alignease.v1.entity.*;
 import com.alignease.v1.exception.AlignEaseValidationsException;
 import com.alignease.v1.repository.ProductRepository;
 import com.alignease.v1.repository.UserRepository;
+import com.alignease.v1.service.FileStorageService;
 import com.alignease.v1.service.ProductService;
 import com.alignease.v1.utils.Messages;
 import com.alignease.v1.utils.RequestStatus;
@@ -39,6 +40,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     @Override
     @Transactional
     public ProductResponse addProduct(ProductRequest productRequest) {
@@ -51,6 +55,13 @@ public class ProductServiceImpl implements ProductService {
             product.setInventory(null);
             product.setIsDeleted("N");
 
+            // Handle image upload
+            if (productRequest.getImageFile() != null && !productRequest.getImageFile().isEmpty()) {
+                String fileName = fileStorageService.storeFile(productRequest.getImageFile());
+                product.setImageName(fileName);
+                product.setImagePath("/product-images/" + fileName);
+            }
+
             Product initialSavedProduct = productRepository.save(product);
 
             if (productRequest.getInventoryRequest() != null) {
@@ -60,19 +71,20 @@ public class ProductServiceImpl implements ProductService {
 
                 Product savedProduct = productRepository.save(initialSavedProduct);
                 logger.info("Product and inventory saved successfully with ID: {}", savedProduct.getProductId());
-
                 productResponse.setProduct(savedProduct);
             } else {
                 productResponse.setProduct(initialSavedProduct);
             }
-            logger.info("Add Product Success");
 
             productResponse.setStatus(RequestStatus.SUCCESS.getStatus());
             productResponse.setResponseCode(ResponseCodes.SUCCESS);
             productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_ADD_SUCCESS, null));
+            logger.info("Add Product Success");
 
         } catch (Exception e) {
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_ADD_FAILURE, null));
+            logger.error("Error adding product: {}", e.getMessage(), e);
+            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
+                    messages.getMessageForResponseCode(ResponseCodes.PRODUCT_ADD_FAILURE, null));
         }
 
         return productResponse;

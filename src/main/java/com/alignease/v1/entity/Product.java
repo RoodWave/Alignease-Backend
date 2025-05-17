@@ -24,6 +24,11 @@ public class Product {
     private String size;
     private String price;
     private String isDeleted;
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Column(name = "image_name")
+    private String imageName;
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonManagedReference
