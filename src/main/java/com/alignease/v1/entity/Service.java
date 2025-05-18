@@ -19,6 +19,10 @@ public class Service {
     private Long serviceId;
     private String name;
     private String description;
+    @Column(columnDefinition = "TEXT")
+    private String longDescription;
+    @Column(columnDefinition = "TEXT")
+    private String benefits;
     private String cost;
     private String estimatedTime;
     @Column(name = "image_path")

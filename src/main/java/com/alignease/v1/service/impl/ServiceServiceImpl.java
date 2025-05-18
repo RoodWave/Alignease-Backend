@@ -61,7 +61,7 @@ public class ServiceServiceImpl implements ServiceService {
             if (serviceRequest.getImageFile() != null && !serviceRequest.getImageFile().isEmpty()) {
                 String fileName = fileStorageService.storeFile(serviceRequest.getImageFile());
                 service.setImageName(fileName);
-                service.setImagePath("/service-images/" + fileName);
+                service.setImagePath("/product-images/" + fileName);
             }
 
             Service savedService = serviceRepository.save(service);

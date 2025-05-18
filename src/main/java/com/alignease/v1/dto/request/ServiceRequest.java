@@ -12,6 +12,8 @@ public class ServiceRequest {
     private String description;
     private String cost;
     private String estimatedTime;
+    private String longDescription;
+    private String benefits;
 
     @JsonIgnore
     private MultipartFile imageFile;
