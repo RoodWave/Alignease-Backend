@@ -18,6 +18,7 @@ public class Review {
 
     private String title;
     private String content;
+    private String rating;
 
     @OneToOne
     @JoinColumn(name = "service_booking_id")

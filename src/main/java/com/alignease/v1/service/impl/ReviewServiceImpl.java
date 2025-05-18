@@ -6,7 +6,6 @@ import com.alignease.v1.dto.request.ServiceReviewRequest;
 import com.alignease.v1.dto.response.ReviewFilterResponse;
 import com.alignease.v1.dto.response.ReviewResponse;
 import com.alignease.v1.entity.*;
-import com.alignease.v1.exception.AlignEaseValidationsException;
 import com.alignease.v1.repository.ProductBookingRepository;
 import com.alignease.v1.repository.ReviewRepository;
 import com.alignease.v1.repository.ServiceBookingRepository;
@@ -68,6 +67,7 @@ public class ReviewServiceImpl implements ReviewService {
         try {
             Review review = new Review();
             review.setTitle(request.getTitle());
+            review.setRating(request.getRating());
             review.setContent(request.getContent());
             review.setReviewStatus(ReviewStatus.PENDING);
             review.setProductBooking(productBooking);
@@ -121,6 +121,7 @@ public class ReviewServiceImpl implements ReviewService {
         try {
             Review review = new Review();
             review.setTitle(request.getTitle());
+            review.setRating(request.getRating());
             review.setContent(request.getContent());
             review.setReviewStatus(ReviewStatus.PENDING);
             review.setServiceBooking(serviceBooking);

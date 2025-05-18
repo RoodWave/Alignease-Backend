@@ -3,7 +3,6 @@ package com.alignease.v1.service.impl;
 import com.alignease.v1.dto.request.AuthRequest;
 import com.alignease.v1.dto.response.AuthResponse;
 import com.alignease.v1.entity.User;
-import com.alignease.v1.exception.AlignEaseValidationsException;
 import com.alignease.v1.repository.UserRepository;
 import com.alignease.v1.service.AuthService;
 import com.alignease.v1.utils.Constant;

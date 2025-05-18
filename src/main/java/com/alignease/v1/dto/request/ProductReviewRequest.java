@@ -8,5 +8,6 @@ import lombok.Setter;
 public class ProductReviewRequest {
     private String title;
     private String content;
+    private String rating;
     private Long productBookingId;
 }

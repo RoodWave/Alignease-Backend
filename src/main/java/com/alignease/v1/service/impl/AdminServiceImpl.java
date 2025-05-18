@@ -3,7 +3,6 @@ package com.alignease.v1.service.impl;
 import com.alignease.v1.dto.response.ProductResponse;
 import com.alignease.v1.dto.response.ServiceResponse;
 import com.alignease.v1.entity.*;
-import com.alignease.v1.exception.AlignEaseValidationsException;
 import com.alignease.v1.repository.ProductBookingRepository;
 import com.alignease.v1.repository.ServiceBookingRepository;
 import com.alignease.v1.service.AdminService;
