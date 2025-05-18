@@ -40,28 +40,32 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Log In Starts");
 
         AuthResponse authResponse = new AuthResponse();
+        Optional<User> activeUserByEmail = userRepository.findActiveUserByEmail(authRequest.getEmail());
 
-        try {
-            Optional<User> activeUserByEmail = userRepository.findActiveUserByEmail(authRequest.getEmail());
-            if (activeUserByEmail.isEmpty()) {
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
-            }
-
-            User user = activeUserByEmail.get();
-
-            if (!bCryptPasswordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.PASSWORD_MISMATCH, null));
-            }
-
-            logger.info("Log In Success");
-            authResponse.setUser(user);
-            authResponse.setStatus(RequestStatus.SUCCESS.getStatus());
-            authResponse.setResponseCode(ResponseCodes.SUCCESS);
-            authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGN_IN_SUCCESS, null));
-        } catch (Exception e) {
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.USER_SIGN_IN_FAILURE, null));
+        if (activeUserByEmail.isEmpty()) {
+            logger.error("User not found with email: {}", authRequest.getEmail());
+            authResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            authResponse.setResponseCode(ResponseCodes.USER_NOT_FOUND);
+            authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
+            return authResponse;
         }
+
+        User user = activeUserByEmail.get();
+
+        if (!bCryptPasswordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+            logger.error("Password mismatch for user: {}", authRequest.getEmail());
+            authResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            authResponse.setResponseCode(ResponseCodes.PASSWORD_MISMATCH);
+            authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PASSWORD_MISMATCH, null));
+            return authResponse;
+        }
+
+        logger.info("Log In Success");
+        authResponse.setUser(user);
+        authResponse.setStatus(RequestStatus.SUCCESS.getStatus());
+        authResponse.setResponseCode(ResponseCodes.SUCCESS);
+        authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGN_IN_SUCCESS, null));
+
         logger.info("Log In Ends");
         return authResponse;
     }
@@ -71,26 +75,35 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Sign Up Starts");
 
         AuthResponse authResponse = new AuthResponse();
+        Optional<User> activeUserByEmail = userRepository.findActiveUserByEmail(authRequest.getEmail());
+
+        if (activeUserByEmail.isPresent()) {
+            logger.error("Email already taken: {}", authRequest.getEmail());
+            authResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            authResponse.setResponseCode(ResponseCodes.EMAIL_ALREADY_TAKEN);
+            authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.EMAIL_ALREADY_TAKEN, null));
+            return authResponse;
+        }
 
         try {
-            Optional<User> activeUserByEmail = userRepository.findActiveUserByEmail(authRequest.getEmail());
-            if (activeUserByEmail.isPresent()) {
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.EMAIL_ALREADY_TAKEN, null));
-            }
-
             User user = modelMapper.map(authRequest, User.class);
             user.setIsDeleted(Constant.DB_FALSE);
             user.setPassword(bCryptPasswordEncoder.encode(authRequest.getPassword()));
 
-            User save = userRepository.save(user);
+            User savedUser = userRepository.save(user);
+
             logger.info("Sign Up Success");
-            authResponse.setUser(save);
+            authResponse.setUser(savedUser);
             authResponse.setStatus(RequestStatus.SUCCESS.getStatus());
             authResponse.setResponseCode(ResponseCodes.SUCCESS);
             authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_SUCCESS, null));
         } catch (Exception e) {
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_FAILURE, null));
+            logger.error("Error during signup: {}", e.getMessage(), e);
+            authResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            authResponse.setResponseCode(ResponseCodes.USER_SIGNUP_FAILURE);
+            authResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_SIGNUP_FAILURE, null));
         }
+
         logger.info("Sign Up Ends");
         return authResponse;
     }
