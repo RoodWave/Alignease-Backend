@@ -1,6 +1,7 @@
 package com.alignease.v1.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,5 +37,6 @@ public class ProductBooking {
     private BookingStatus bookingStatus;
 
     @OneToOne(mappedBy = "productBooking", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Review review;
 }

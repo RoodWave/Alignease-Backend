@@ -1,5 +1,6 @@
 package com.alignease.v1.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +21,12 @@ public class Review {
 
     @OneToOne
     @JoinColumn(name = "service_booking_id")
+    @JsonBackReference
     private ServiceBooking serviceBooking;
 
     @OneToOne
     @JoinColumn(name = "product_booking_id")
+    @JsonBackReference
     private ProductBooking productBooking;
 
     @Enumerated(EnumType.STRING)
