@@ -1,5 +1,7 @@
 package com.alignease.v1.service.impl;
 
+import com.alignease.v1.dto.ProductBookingDTO;
+import com.alignease.v1.dto.ServiceBookingDTO;
 import com.alignease.v1.dto.response.ProductResponse;
 import com.alignease.v1.dto.response.ServiceResponse;
 import com.alignease.v1.entity.*;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -159,16 +162,34 @@ public class AdminServiceImpl implements AdminService {
         logger.info("Fetching all service bookings with status: {}", bookingStatus);
 
         ServiceResponse serviceResponse = new ServiceResponse();
-        if (bookingStatus != null) {
-            List<ServiceBooking> byBookingStatus = serviceBookingRepository.findByBookingStatus(bookingStatus);
-            serviceResponse.setServiceBookings(byBookingStatus);
-        } else {
-            List<ServiceBooking> all = serviceBookingRepository.findAll();
-            serviceResponse.setServiceBookings(all);
+        try {
+            List<ServiceBooking> serviceBookings;
+            if (bookingStatus != null) {
+                serviceBookings = serviceBookingRepository.findByBookingStatusWithService(bookingStatus);
+            } else {
+                serviceBookings = serviceBookingRepository.findAllWithService();
+            }
+
+            List<ServiceBookingDTO> serviceBookingsWithDetails = serviceBookings.stream()
+                    .map(booking -> {
+                        ServiceBookingDTO dto = new ServiceBookingDTO();
+                        dto.setServiceBooking(booking);
+                        dto.setService(booking.getService());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+
+            serviceResponse.setServiceBookingsWithDetails(serviceBookingsWithDetails);
+
+            serviceResponse.setStatus(RequestStatus.SUCCESS.getStatus());
+            serviceResponse.setResponseCode(ResponseCodes.SUCCESS);
+        } catch (Exception e) {
+            logger.error("Error fetching service bookings: {}", e.getMessage());
+            serviceResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            serviceResponse.setResponseCode(ResponseCodes.INTERNAL_SERVER_ERROR);
+            serviceResponse.setMessage("Error fetching service bookings");
         }
 
-        serviceResponse.setStatus(RequestStatus.SUCCESS.getStatus());
-        serviceResponse.setResponseCode(ResponseCodes.SUCCESS);
         logger.info("Fetching service bookings Ends");
         return serviceResponse;
     }
@@ -178,16 +199,33 @@ public class AdminServiceImpl implements AdminService {
         logger.info("Fetching all product bookings with status: {}", bookingStatus);
 
         ProductResponse productResponse = new ProductResponse();
-        if (bookingStatus != null) {
-            List<ProductBooking> byBookingStatus = productBookingRepository.findByBookingStatus(bookingStatus);
-            productResponse.setProductBookings(byBookingStatus);
-        } else {
-            List<ProductBooking> all = productBookingRepository.findAll();
-            productResponse.setProductBookings(all);
+        try {
+            List<ProductBooking> productBookings;
+            if (bookingStatus != null) {
+                productBookings = productBookingRepository.findByBookingStatus(bookingStatus);
+            } else {
+                productBookings = productBookingRepository.findAll();
+            }
+
+            List<ProductBookingDTO> productBookingsWithDetails = productBookings.stream()
+                    .map(booking -> {
+                        ProductBookingDTO dto = new ProductBookingDTO();
+                        dto.setProductBooking(booking);
+                        dto.setProduct(booking.getProduct());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+
+            productResponse.setProductBookingsWithDetails(productBookingsWithDetails);
+            productResponse.setStatus(RequestStatus.SUCCESS.getStatus());
+            productResponse.setResponseCode(ResponseCodes.SUCCESS);
+        } catch (Exception e) {
+            logger.error("Error fetching product bookings: {}", e.getMessage());
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.INTERNAL_SERVER_ERROR);
+            productResponse.setMessage("Error fetching product bookings");
         }
 
-        productResponse.setStatus(RequestStatus.SUCCESS.getStatus());
-        productResponse.setResponseCode(ResponseCodes.SUCCESS);
         logger.info("Fetching product bookings Ends");
         return productResponse;
     }
