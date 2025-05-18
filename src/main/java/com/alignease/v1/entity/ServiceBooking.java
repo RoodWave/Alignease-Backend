@@ -20,6 +20,7 @@ public class ServiceBooking {
     private Long serviceBookingId;
 
     private LocalDateTime bookingDate;
+    private LocalDateTime bookedDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

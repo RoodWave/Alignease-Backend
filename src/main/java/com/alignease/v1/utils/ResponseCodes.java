@@ -33,6 +33,7 @@ public class ResponseCodes {
     public static final String SERVICE_BOOKING_NOT_FOUND = "918";
     public static final String SERVICE_BOOKING_APPROVED = "919";
     public static final String SERVICE_BOOKING_REJECTED = "920";
+    public static final String INVALID_BOOKING_DATETIME = "921";
 
     public static final String SERVICE_ADD_SUCCESS = "1000";
     public static final String SERVICE_ADD_FAILURE = "1001";

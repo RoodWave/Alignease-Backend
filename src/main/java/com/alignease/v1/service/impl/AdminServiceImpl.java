@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AdminServiceImpl implements AdminService {
 
@@ -136,5 +138,43 @@ public class AdminServiceImpl implements AdminService {
 
         logger.info("Service booking ID {} status updated to {}", bookingId, status);
         return response;
+    }
+
+    @Override
+    public ServiceResponse getAllServiceBookings(BookingStatus bookingStatus) {
+        logger.info("Fetching all service bookings with status: {}", bookingStatus);
+
+        ServiceResponse serviceResponse = new ServiceResponse();
+        if (bookingStatus != null) {
+            List<ServiceBooking> byBookingStatus = serviceBookingRepository.findByBookingStatus(bookingStatus);
+            serviceResponse.setServiceBookings(byBookingStatus);
+        } else {
+            List<ServiceBooking> all = serviceBookingRepository.findAll();
+            serviceResponse.setServiceBookings(all);
+        }
+
+        serviceResponse.setStatus(RequestStatus.SUCCESS.getStatus());
+        serviceResponse.setResponseCode(ResponseCodes.SUCCESS);
+        logger.info("Fetching service bookings Ends");
+        return serviceResponse;
+    }
+
+    @Override
+    public ProductResponse getAllProductBookings(BookingStatus bookingStatus) {
+        logger.info("Fetching all product bookings with status: {}", bookingStatus);
+
+        ProductResponse productResponse = new ProductResponse();
+        if (bookingStatus != null) {
+            List<ProductBooking> byBookingStatus = productBookingRepository.findByBookingStatus(bookingStatus);
+            productResponse.setProductBookings(byBookingStatus);
+        } else {
+            List<ProductBooking> all = productBookingRepository.findAll();
+            productResponse.setProductBookings(all);
+        }
+
+        productResponse.setStatus(RequestStatus.SUCCESS.getStatus());
+        productResponse.setResponseCode(ResponseCodes.SUCCESS);
+        logger.info("Fetching product bookings Ends");
+        return productResponse;
     }
 }

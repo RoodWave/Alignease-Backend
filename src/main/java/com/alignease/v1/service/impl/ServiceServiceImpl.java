@@ -242,10 +242,19 @@ public class ServiceServiceImpl implements ServiceService {
                         messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
             }
 
+            if (request.getSelectedDate() == null || request.getSelectedTime() == null) {
+                logger.error("Date or time not provided for booking");
+                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
+                        messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_DATETIME, null));
+            }
+
+            LocalDateTime bookingDateTime = LocalDateTime.of(request.getSelectedDate(), request.getSelectedTime());
+
             ServiceBooking booking = new ServiceBooking();
             booking.setService(serviceOpt.get());
             booking.setUser(userOpt.get());
-            booking.setBookingDate(LocalDateTime.now());
+            booking.setBookingDate(bookingDateTime);
+            booking.setBookedDate(LocalDateTime.now());
             booking.setBookingStatus(BookingStatus.PENDING);
 
             serviceOpt.get().getServiceBookings().add(booking);

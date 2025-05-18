@@ -2,6 +2,7 @@ package com.alignease.v1.controller;
 
 import com.alignease.v1.dto.response.ProductResponse;
 import com.alignease.v1.dto.response.ServiceResponse;
+import com.alignease.v1.entity.BookingStatus;
 import com.alignease.v1.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,5 +33,17 @@ public class AdminController {
     @PostMapping("/service-bookings/{bookingId}/reject")
     public ServiceResponse rejectServiceBooking(@PathVariable Long bookingId) {
         return adminService.rejectServiceBooking(bookingId);
+    }
+
+    @GetMapping("/service-bookings")
+    public ServiceResponse getAllServiceBookings(
+            @RequestParam(required = false) BookingStatus status) {
+        return adminService.getAllServiceBookings(status);
+    }
+
+    @GetMapping("/product-bookings")
+    public ProductResponse getAllProductBookings(
+            @RequestParam(required = false) BookingStatus status) {
+        return adminService.getAllProductBookings(status);
     }
 }
