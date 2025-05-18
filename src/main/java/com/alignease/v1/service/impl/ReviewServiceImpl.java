@@ -3,6 +3,7 @@ package com.alignease.v1.service.impl;
 import com.alignease.v1.dto.request.ProductReviewRequest;
 import com.alignease.v1.dto.request.ReviewStatusRequest;
 import com.alignease.v1.dto.request.ServiceReviewRequest;
+import com.alignease.v1.dto.response.ReviewFilterResponse;
 import com.alignease.v1.dto.response.ReviewResponse;
 import com.alignease.v1.entity.*;
 import com.alignease.v1.exception.AlignEaseValidationsException;
@@ -18,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -150,6 +153,27 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return response;
+    }
+
+    @Override
+    public ReviewFilterResponse fetchReviews(ReviewStatus reviewStatus) {
+        logger.info("Fetching all reviews with status: {}", reviewStatus);
+
+        ReviewFilterResponse reviewFilterResponse = new ReviewFilterResponse();
+
+        List<Review> reviews;
+        if (reviewStatus != null) {
+            reviews = reviewRepository.findByReviewStatus(reviewStatus);
+            reviewFilterResponse.setReviews(reviews);
+        } else {
+            reviews = reviewRepository.findAll();
+            reviewFilterResponse.setReviews(reviews);
+        }
+
+        reviewFilterResponse.setStatus(RequestStatus.SUCCESS.getStatus());
+        reviewFilterResponse.setResponseCode(ResponseCodes.SUCCESS);
+        logger.info("Fetching all reviews with status ends");
+        return reviewFilterResponse;
     }
 
     private void mapReviewToResponse(Review review, ReviewResponse response, boolean isServiceReview) {
