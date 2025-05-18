@@ -4,7 +4,6 @@ import com.alignease.v1.dto.request.ProductBookingRequest;
 import com.alignease.v1.dto.request.ProductRequest;
 import com.alignease.v1.dto.response.ProductResponse;
 import com.alignease.v1.entity.*;
-import com.alignease.v1.exception.AlignEaseValidationsException;
 import com.alignease.v1.repository.ProductRepository;
 import com.alignease.v1.repository.UserRepository;
 import com.alignease.v1.service.FileStorageService;
@@ -83,8 +82,9 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             logger.error("Error adding product: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.PRODUCT_ADD_FAILURE, null));
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_ADD_FAILURE);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_ADD_FAILURE, null));
         }
 
         return productResponse;
@@ -97,14 +97,16 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse productResponse = new ProductResponse();
 
+        Optional<Product> existingProductOpt = productRepository.findByProductIdAndIsDeleted(productId, "N");
+        if (existingProductOpt.isEmpty()) {
+            logger.error("Product not found with ID: {}", productId);
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_NOT_FOUND);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
+            return productResponse;
+        }
+
         try {
-            Optional<Product> existingProductOpt = productRepository.findByProductIdAndIsDeleted(productId, "N");
-
-            if (existingProductOpt.isEmpty()) {
-                logger.error("Product not found with ID: {}", productId);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
-            }
-
             Product existingProduct = existingProductOpt.get();
 
             existingProduct.setName(productRequest.getName());
@@ -138,7 +140,9 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             logger.error("Error updating product: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_UPDATE_FAILURE, null));
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_UPDATE_FAILURE);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_UPDATE_FAILURE, null));
         }
 
         return productResponse;
@@ -150,14 +154,16 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse productResponse = new ProductResponse();
 
+        Optional<Product> productOpt = productRepository.findByProductIdAndIsDeleted(productId, "N");
+        if (productOpt.isEmpty()) {
+            logger.error("Product not found with ID: {}", productId);
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_NOT_FOUND);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
+            return productResponse;
+        }
+
         try {
-            Optional<Product> productOpt = productRepository.findByProductIdAndIsDeleted(productId, "N");
-
-            if (productOpt.isEmpty()) {
-                logger.error("Product not found with ID: {}", productId);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
-            }
-
             Product product = productOpt.get();
             productResponse.setProduct(product);
             productResponse.setStatus(RequestStatus.SUCCESS.getStatus());
@@ -168,7 +174,9 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             logger.error("Error fetching product: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_FETCH_FAILURE, null));
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_FETCH_FAILURE);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_FETCH_FAILURE, null));
         }
 
         return productResponse;
@@ -192,7 +200,9 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             logger.error("Error fetching all products: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_UPDATE_FAILURE, null));
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_FETCH_FAILURE);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_FETCH_FAILURE, null));
         }
 
         return productResponse;
@@ -205,14 +215,16 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse productResponse = new ProductResponse();
 
+        Optional<Product> productOpt = productRepository.findByProductIdAndIsDeleted(productId, "N");
+        if (productOpt.isEmpty()) {
+            logger.error("Product not found with ID: {}", productId);
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_NOT_FOUND);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
+            return productResponse;
+        }
+
         try {
-            Optional<Product> productOpt = productRepository.findByProductIdAndIsDeleted(productId, "N");
-
-            if (productOpt.isEmpty()) {
-                logger.error("Product not found with ID: {}", productId);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
-            }
-
             Product product = productOpt.get();
             product.setIsDeleted("Y");
 
@@ -228,7 +240,9 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             logger.error("Error deleting product: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE, messages.getMessageForResponseCode(ResponseCodes.PRODUCT_DELETE_FAILURE, null));
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_DELETE_FAILURE);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_DELETE_FAILURE, null));
         }
 
         return productResponse;
@@ -241,41 +255,48 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse productResponse = new ProductResponse();
 
+        Optional<Product> productOpt = productRepository.findByProductIdAndIsDeleted(
+                productBookingRequest.getProductId(), "N");
+        if (productOpt.isEmpty()) {
+            logger.error("Product not found with ID: {}", productBookingRequest.getProductId());
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_NOT_FOUND);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
+            return productResponse;
+        }
+
+        Product product = productOpt.get();
+
+        if (product.getInventory() == null || product.getInventory().getQuantity() == null) {
+            logger.error("No inventory information available for product ID: {}", product.getProductId());
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.INVENTORY_NOT_FOUND);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.INVENTORY_NOT_FOUND, null));
+            return productResponse;
+        }
+
+        int availableQuantity = product.getInventory().getQuantity();
+        int requestedQuantity = productBookingRequest.getQuantity();
+
+        if (availableQuantity < requestedQuantity) {
+            logger.error("Insufficient inventory for product ID: {}. Available: {}, Requested: {}",
+                    product.getProductId(), availableQuantity, requestedQuantity);
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.INSUFFICIENT_INVENTORY);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.INSUFFICIENT_INVENTORY, null));
+            return productResponse;
+        }
+
+        Optional<User> userOpt = userRepository.findById(productBookingRequest.getUserId());
+        if (userOpt.isEmpty()) {
+            logger.error("User not found with ID: {}", productBookingRequest.getUserId());
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.USER_NOT_FOUND);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
+            return productResponse;
+        }
+
         try {
-            Optional<Product> productOpt = productRepository.findByProductIdAndIsDeleted(
-                    productBookingRequest.getProductId(), "N");
-
-            if (productOpt.isEmpty()) {
-                logger.error("Product not found with ID: {}", productBookingRequest.getProductId());
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.PRODUCT_NOT_FOUND, null));
-            }
-
-            Product product = productOpt.get();
-
-            if (product.getInventory() == null || product.getInventory().getQuantity() == null) {
-                logger.error("No inventory information available for product ID: {}", product.getProductId());
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.INVENTORY_NOT_FOUND, null));
-            }
-
-            int availableQuantity = product.getInventory().getQuantity();
-            int requestedQuantity = productBookingRequest.getQuantity();
-
-            if (availableQuantity < requestedQuantity) {
-                logger.error("Insufficient inventory for product ID: {}. Available: {}, Requested: {}",
-                        product.getProductId(), availableQuantity, requestedQuantity);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.INSUFFICIENT_INVENTORY, null));
-            }
-
-            Optional<User> userOpt = userRepository.findById(productBookingRequest.getUserId());
-            if (userOpt.isEmpty()) {
-                logger.error("User not found with ID: {}", productBookingRequest.getUserId());
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
-            }
-
             ProductBooking productBooking = new ProductBooking();
             productBooking.setProduct(product);
             productBooking.setQuantity(requestedQuantity);
@@ -299,9 +320,9 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             logger.error("Error booking product: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(
-                    ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.PRODUCT_BOOKING_FAILURE, null));
+            productResponse.setStatus(RequestStatus.FAILURE.getStatus());
+            productResponse.setResponseCode(ResponseCodes.PRODUCT_BOOKING_FAILURE);
+            productResponse.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_BOOKING_FAILURE, null));
         }
 
         return productResponse;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -63,17 +64,24 @@ public class AdminServiceImpl implements AdminService {
     private ProductResponse updateProductBookingStatus(Long bookingId, BookingStatus status) {
         ProductResponse response = new ProductResponse();
 
-        ProductBooking booking = productBookingRepository.findById(bookingId)
-                .orElseThrow(() -> {
-                    logger.error("Product booking not found with ID: {}", bookingId);
-                    return new AlignEaseValidationsException(
-                            messages.getMessageForResponseCode(ResponseCodes.PRODUCT_BOOKING_NOT_FOUND, null));
-                });
+        Optional<ProductBooking> bookingOptional = productBookingRepository.findById(bookingId);
+
+        if (bookingOptional.isEmpty()) {
+            logger.error("Product booking not found with ID: {}", bookingId);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.PRODUCT_BOOKING_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_BOOKING_NOT_FOUND, null));
+            return response;
+        }
+
+        ProductBooking booking = bookingOptional.get();
 
         if (booking.getBookingStatus() != BookingStatus.PENDING) {
             logger.error("Product booking ID {} is not in PENDING state", bookingId);
-            throw new AlignEaseValidationsException(
-                    messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_STATE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.INVALID_BOOKING_STATE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_STATE, null));
+            return response;
         }
 
         booking.setBookingStatus(status);
@@ -112,17 +120,24 @@ public class AdminServiceImpl implements AdminService {
     private ServiceResponse updateServiceBookingStatus(Long bookingId, BookingStatus status) {
         ServiceResponse response = new ServiceResponse();
 
-        ServiceBooking booking = serviceBookingRepository.findById(bookingId)
-                .orElseThrow(() -> {
-                    logger.error("Service booking not found with ID: {}", bookingId);
-                    return new AlignEaseValidationsException(
-                            messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_NOT_FOUND, null));
-                });
+        Optional<ServiceBooking> bookingOptional = serviceBookingRepository.findById(bookingId);
+
+        if (bookingOptional.isEmpty()) {
+            logger.error("Service booking not found with ID: {}", bookingId);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_BOOKING_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_NOT_FOUND, null));
+            return response;
+        }
+
+        ServiceBooking booking = bookingOptional.get();
 
         if (booking.getBookingStatus() != BookingStatus.PENDING) {
             logger.error("Service booking ID {} is not in PENDING state", bookingId);
-            throw new AlignEaseValidationsException(
-                    messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_STATE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.INVALID_BOOKING_STATE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_STATE, null));
+            return response;
         }
 
         booking.setBookingStatus(status);

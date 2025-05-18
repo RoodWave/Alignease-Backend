@@ -72,16 +72,23 @@ public class ServiceServiceImpl implements ServiceService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_ADD_SUCCESS, null));
 
             logger.info("Add Service Success");
+
+        } catch (AlignEaseValidationsException e) {
+            logger.error("Validation error adding service: {}", e.getMessage());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.BAD_REQUEST_CODE);
+            response.setMessage(e.getMessage());
         } catch (Exception e) {
             logger.error("Error adding service: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_ADD_FAILURE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_ADD_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_ADD_FAILURE, null));
         }
 
         return response;
     }
 
-    private void validateImage(MultipartFile file) {
+    private void validateImage(MultipartFile file) throws AlignEaseValidationsException {
         if (file.isEmpty()) {
             throw new AlignEaseValidationsException("Image file is empty");
         }
@@ -103,15 +110,16 @@ public class ServiceServiceImpl implements ServiceService {
 
         ServiceResponse response = new ServiceResponse();
 
+        Optional<Service> serviceOpt = serviceRepository.findById(serviceId);
+        if (serviceOpt.isEmpty()) {
+            logger.error("Service not found with ID: {}", serviceId);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
+            return response;
+        }
+
         try {
-            Optional<Service> serviceOpt = serviceRepository.findById(serviceId);
-
-            if (serviceOpt.isEmpty()) {
-                logger.error("Service not found with ID: {}", serviceId);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
-            }
-
             Service service = serviceOpt.get();
             service.setName(serviceRequest.getName());
             service.setDescription(serviceRequest.getDescription());
@@ -126,10 +134,12 @@ public class ServiceServiceImpl implements ServiceService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_UPDATE_SUCCESS, null));
 
             logger.info("Update Service Success");
+
         } catch (Exception e) {
             logger.error("Error updating service: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_UPDATE_FAILURE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_UPDATE_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_UPDATE_FAILURE, null));
         }
 
         return response;
@@ -141,25 +151,28 @@ public class ServiceServiceImpl implements ServiceService {
 
         ServiceResponse response = new ServiceResponse();
 
+        Optional<Service> serviceOpt = serviceRepository.findById(serviceId);
+        if (serviceOpt.isEmpty()) {
+            logger.error("Service not found with ID: {}", serviceId);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
+            return response;
+        }
+
         try {
-            Optional<Service> serviceOpt = serviceRepository.findById(serviceId);
-
-            if (serviceOpt.isEmpty()) {
-                logger.error("Service not found with ID: {}", serviceId);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
-            }
-
             response.setService(serviceOpt.get());
             response.setStatus(RequestStatus.SUCCESS.getStatus());
             response.setResponseCode(ResponseCodes.SUCCESS);
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_FETCH_SUCCESS, null));
 
             logger.info("Get Service by ID Success");
+
         } catch (Exception e) {
             logger.error("Error fetching service: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_FETCH_FAILURE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_FETCH_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_FETCH_FAILURE, null));
         }
 
         return response;
@@ -179,10 +192,12 @@ public class ServiceServiceImpl implements ServiceService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_FETCH_SUCCESS, null));
 
             logger.info("Get All Services Success. Found {} services", services.size());
+
         } catch (Exception e) {
             logger.error("Error fetching all services: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_FETCH_FAILURE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_FETCH_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_FETCH_FAILURE, null));
         }
 
         return response;
@@ -195,15 +210,16 @@ public class ServiceServiceImpl implements ServiceService {
 
         ServiceResponse response = new ServiceResponse();
 
+        Optional<Service> serviceOpt = serviceRepository.findById(serviceId);
+        if (serviceOpt.isEmpty()) {
+            logger.error("Service not found with ID: {}", serviceId);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
+            return response;
+        }
+
         try {
-            Optional<Service> serviceOpt = serviceRepository.findById(serviceId);
-
-            if (serviceOpt.isEmpty()) {
-                logger.error("Service not found with ID: {}", serviceId);
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
-            }
-
             serviceRepository.delete(serviceOpt.get());
 
             response.setStatus(RequestStatus.SUCCESS.getStatus());
@@ -211,10 +227,12 @@ public class ServiceServiceImpl implements ServiceService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_DELETE_SUCCESS, null));
 
             logger.info("Delete Service Success");
+
         } catch (Exception e) {
             logger.error("Error deleting service: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_DELETE_FAILURE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_DELETE_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_DELETE_FAILURE, null));
         }
 
         return response;
@@ -227,27 +245,33 @@ public class ServiceServiceImpl implements ServiceService {
 
         ServiceResponse response = new ServiceResponse();
 
+        Optional<Service> serviceOpt = serviceRepository.findById(request.getServiceId());
+        if (serviceOpt.isEmpty()) {
+            logger.error("Service not found with ID: {}", request.getServiceId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
+            return response;
+        }
+
+        Optional<User> userOpt = userRepository.findById(request.getUserId());
+        if (userOpt.isEmpty()) {
+            logger.error("User not found with ID: {}", request.getUserId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.USER_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
+            return response;
+        }
+
+        if (request.getSelectedDate() == null || request.getSelectedTime() == null) {
+            logger.error("Date or time not provided for booking");
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.INVALID_BOOKING_DATETIME);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_DATETIME, null));
+            return response;
+        }
+
         try {
-            Optional<Service> serviceOpt = serviceRepository.findById(request.getServiceId());
-            if (serviceOpt.isEmpty()) {
-                logger.error("Service not found with ID: {}", request.getServiceId());
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.SERVICE_NOT_FOUND, null));
-            }
-
-            Optional<User> userOpt = userRepository.findById(request.getUserId());
-            if (userOpt.isEmpty()) {
-                logger.error("User not found with ID: {}", request.getUserId());
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.USER_NOT_FOUND, null));
-            }
-
-            if (request.getSelectedDate() == null || request.getSelectedTime() == null) {
-                logger.error("Date or time not provided for booking");
-                throw new AlignEaseValidationsException(ResponseCodes.BAD_REQUEST_CODE,
-                        messages.getMessageForResponseCode(ResponseCodes.INVALID_BOOKING_DATETIME, null));
-            }
-
             LocalDateTime bookingDateTime = LocalDateTime.of(request.getSelectedDate(), request.getSelectedTime());
 
             ServiceBooking booking = new ServiceBooking();
@@ -263,15 +287,14 @@ public class ServiceServiceImpl implements ServiceService {
             response.setService(updatedService);
             response.setStatus(RequestStatus.SUCCESS.getStatus());
             response.setResponseCode(ResponseCodes.SUCCESS);
-            response.setMessage(messages.getMessageForResponseCode(
-                    ResponseCodes.SERVICE_BOOKING_SUCCESS, null));
-
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_SUCCESS, null));
             logger.info("Service booking successful for service ID: {}", request.getServiceId());
+
         } catch (Exception e) {
             logger.error("Error booking service: {}", e.getMessage(), e);
-            throw new AlignEaseValidationsException(
-                    ResponseCodes.BAD_REQUEST_CODE,
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_FAILURE, null));
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_BOOKING_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_FAILURE, null));
         }
 
         return response;

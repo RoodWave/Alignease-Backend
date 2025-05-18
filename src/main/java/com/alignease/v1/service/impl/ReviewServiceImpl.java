@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -46,16 +47,25 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewResponse response = new ReviewResponse();
 
+        Optional<ProductBooking> productBookingOpt = productBookingRepository.findById(request.getProductBookingId());
+        if (productBookingOpt.isEmpty()) {
+            logger.error("Product booking not found with ID: {}", request.getProductBookingId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.PRODUCT_BOOKING_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_BOOKING_NOT_FOUND, null));
+            return response;
+        }
+
+        ProductBooking productBooking = productBookingOpt.get();
+        if (productBooking.getReview() != null) {
+            logger.error("Review already exists for product booking ID: {}", request.getProductBookingId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.REVIEW_ALREADY_EXISTS);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.REVIEW_ALREADY_EXISTS, null));
+            return response;
+        }
+
         try {
-            ProductBooking productBooking = productBookingRepository.findById(request.getProductBookingId())
-                    .orElseThrow(() -> new AlignEaseValidationsException(
-                            messages.getMessageForResponseCode(ResponseCodes.PRODUCT_BOOKING_NOT_FOUND, null)));
-
-            if (productBooking.getReview() != null) {
-                throw new AlignEaseValidationsException(
-                        messages.getMessageForResponseCode(ResponseCodes.REVIEW_ALREADY_EXISTS, null));
-            }
-
             Review review = new Review();
             review.setTitle(request.getTitle());
             review.setContent(request.getContent());
@@ -72,10 +82,12 @@ public class ReviewServiceImpl implements ReviewService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_REVIEW_CREATED, null));
 
             logger.info("Product review created successfully with ID: {}", savedReview.getReviewId());
+
         } catch (Exception e) {
-            logger.error("Error creating product review: {}", e.getMessage());
-            throw new AlignEaseValidationsException(
-                    messages.getMessageForResponseCode(ResponseCodes.PRODUCT_REVIEW_CREATION_FAILED, null));
+            logger.error("Error creating product review: {}", e.getMessage(), e);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.PRODUCT_REVIEW_CREATION_FAILED);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.PRODUCT_REVIEW_CREATION_FAILED, null));
         }
 
         return response;
@@ -88,16 +100,25 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewResponse response = new ReviewResponse();
 
+        Optional<ServiceBooking> serviceBookingOpt = serviceBookingRepository.findById(request.getServiceBookingId());
+        if (serviceBookingOpt.isEmpty()) {
+            logger.error("Service booking not found with ID: {}", request.getServiceBookingId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_BOOKING_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_NOT_FOUND, null));
+            return response;
+        }
+
+        ServiceBooking serviceBooking = serviceBookingOpt.get();
+        if (serviceBooking.getReview() != null) {
+            logger.error("Review already exists for service booking ID: {}", request.getServiceBookingId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.REVIEW_ALREADY_EXISTS);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.REVIEW_ALREADY_EXISTS, null));
+            return response;
+        }
+
         try {
-            ServiceBooking serviceBooking = serviceBookingRepository.findById(request.getServiceBookingId())
-                    .orElseThrow(() -> new AlignEaseValidationsException(
-                            messages.getMessageForResponseCode(ResponseCodes.SERVICE_BOOKING_NOT_FOUND, null)));
-
-            if (serviceBooking.getReview() != null) {
-                throw new AlignEaseValidationsException(
-                        messages.getMessageForResponseCode(ResponseCodes.REVIEW_ALREADY_EXISTS, null));
-            }
-
             Review review = new Review();
             review.setTitle(request.getTitle());
             review.setContent(request.getContent());
@@ -114,10 +135,12 @@ public class ReviewServiceImpl implements ReviewService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_REVIEW_CREATED, null));
 
             logger.info("Service review created successfully with ID: {}", savedReview.getReviewId());
+
         } catch (Exception e) {
-            logger.error("Error creating service review: {}", e.getMessage());
-            throw new AlignEaseValidationsException(
-                    messages.getMessageForResponseCode(ResponseCodes.SERVICE_REVIEW_CREATION_FAILED, null));
+            logger.error("Error creating service review: {}", e.getMessage(), e);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.SERVICE_REVIEW_CREATION_FAILED);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.SERVICE_REVIEW_CREATION_FAILED, null));
         }
 
         return response;
@@ -130,11 +153,17 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewResponse response = new ReviewResponse();
 
-        try {
-            Review review = reviewRepository.findById(request.getReviewId())
-                    .orElseThrow(() -> new AlignEaseValidationsException(
-                            messages.getMessageForResponseCode(ResponseCodes.REVIEW_NOT_FOUND, null)));
+        Optional<Review> reviewOpt = reviewRepository.findById(request.getReviewId());
+        if (reviewOpt.isEmpty()) {
+            logger.error("Review not found with ID: {}", request.getReviewId());
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.REVIEW_NOT_FOUND);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.REVIEW_NOT_FOUND, null));
+            return response;
+        }
 
+        try {
+            Review review = reviewOpt.get();
             review.setReviewStatus(request.getStatus());
             Review updatedReview = reviewRepository.save(review);
 
@@ -146,10 +175,12 @@ public class ReviewServiceImpl implements ReviewService {
             response.setMessage(messages.getMessageForResponseCode(ResponseCodes.REVIEW_STATUS_UPDATED, null));
 
             logger.info("Review status updated successfully for review ID: {}", request.getReviewId());
+
         } catch (Exception e) {
-            logger.error("Error updating review status: {}", e.getMessage());
-            throw new AlignEaseValidationsException(
-                    messages.getMessageForResponseCode(ResponseCodes.REVIEW_STATUS_UPDATE_FAILED, null));
+            logger.error("Error updating review status: {}", e.getMessage(), e);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.REVIEW_STATUS_UPDATE_FAILED);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.REVIEW_STATUS_UPDATE_FAILED, null));
         }
 
         return response;
@@ -158,22 +189,26 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ReviewFilterResponse fetchReviews(ReviewStatus reviewStatus) {
         logger.info("Fetching all reviews with status: {}", reviewStatus);
+        ReviewFilterResponse response = new ReviewFilterResponse();
 
-        ReviewFilterResponse reviewFilterResponse = new ReviewFilterResponse();
+        try {
+            List<Review> reviews = reviewStatus != null
+                    ? reviewRepository.findByReviewStatus(reviewStatus)
+                    : reviewRepository.findAll();
 
-        List<Review> reviews;
-        if (reviewStatus != null) {
-            reviews = reviewRepository.findByReviewStatus(reviewStatus);
-            reviewFilterResponse.setReviews(reviews);
-        } else {
-            reviews = reviewRepository.findAll();
-            reviewFilterResponse.setReviews(reviews);
+            response.setReviews(reviews);
+            response.setStatus(RequestStatus.SUCCESS.getStatus());
+            response.setResponseCode(ResponseCodes.SUCCESS);
+            logger.info("Found {} reviews", reviews.size());
+
+        } catch (Exception e) {
+            logger.error("Error fetching reviews: {}", e.getMessage(), e);
+            response.setStatus(RequestStatus.FAILURE.getStatus());
+            response.setResponseCode(ResponseCodes.REVIEW_FETCH_FAILURE);
+            response.setMessage(messages.getMessageForResponseCode(ResponseCodes.REVIEW_FETCH_FAILURE, null));
         }
 
-        reviewFilterResponse.setStatus(RequestStatus.SUCCESS.getStatus());
-        reviewFilterResponse.setResponseCode(ResponseCodes.SUCCESS);
-        logger.info("Fetching all reviews with status ends");
-        return reviewFilterResponse;
+        return response;
     }
 
     private void mapReviewToResponse(Review review, ReviewResponse response, boolean isServiceReview) {
