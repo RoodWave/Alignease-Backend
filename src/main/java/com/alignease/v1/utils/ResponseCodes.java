@@ -58,4 +58,11 @@ public class ResponseCodes {
     public static final String REVIEW_STATUS_UPDATED = "1106";
     public static final String REVIEW_STATUS_UPDATE_FAILED = "1107";
     public static final String REVIEW_FETCH_FAILURE = "1108";
+    public static final String REPORT_CREATE_SUCCESS = "1200";
+    public static final String REPORT_CREATE_FAILURE = "1201";
+    public static final String REPORTS_FETCH_SUCCESS = "1202";
+    public static final String REPORTS_FETCH_FAILURE = "1203";
+    public static final String REPORTS_STATUS_UPDATE_SUCCESS = "1204";
+    public static final String REPORTS_STATUS_UPDATE_FAILURE = "1205";
+    public static final String REPORT_NOT_FOUND = "1206";
 }
